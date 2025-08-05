@@ -6,7 +6,7 @@ const Home = () => {
   return (
     <div>
       <Button>Bootcamp</Button>
-      <p>teste commit</p>
+      <p>teste commit pelo terminal</p>
     </div>
   );
 };
