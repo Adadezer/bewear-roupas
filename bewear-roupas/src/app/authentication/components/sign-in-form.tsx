@@ -1,8 +1,10 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import z from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -23,6 +25,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { authClient } from "@/lib/auth-client";
 
 const formSchemaSignIn = z.object({
   email: z.email("Email inválido"),
@@ -30,6 +33,7 @@ const formSchemaSignIn = z.object({
 });
 
 const SignInForm = () => {
+  const router = useRouter();
   const form = useForm<z.infer<typeof formSchemaSignIn>>({
     resolver: zodResolver(formSchemaSignIn),
     defaultValues: {
@@ -38,9 +42,33 @@ const SignInForm = () => {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchemaSignIn>) {
-    console.log("FOMULÁRIO DE LOGIN VÁLIDO E ENVIADO!");
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchemaSignIn>) {
+    await authClient.signIn.email({
+      email: values.email,
+      password: values.password,
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/");
+        },
+        onError: (ctx) => {
+          if (ctx.error.code === "USER_NOT_FOUND") {
+            toast.error("Login não encontrado");
+            return form.setError("email", {
+              message: "Email ou senha inválidos",
+            });
+          }
+          if (ctx.error.code === "INVALID_EMAIL_OR_PASSWORD") {
+            toast.error("Login não encontrado");
+            form.setError("email", {
+              message: "Email ou senha inválidos",
+            });
+            return form.setError("password", {
+              message: "Email ou senha inválidos",
+            });
+          }
+        },
+      },
+    });
   }
 
   return (
