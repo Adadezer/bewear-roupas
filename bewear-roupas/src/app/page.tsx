@@ -30,6 +30,7 @@ const Home = async () => {
       <Header />
       <div className="space-y-6">
         <div className="p-5">
+          {/* Forma para dimensionar a imagem de acordo com o tamanho da tela */}
           <Image
             src="/banner-01.png"
             alt="Leve uma vida com estilo"

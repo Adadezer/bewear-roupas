@@ -4,26 +4,38 @@ import React from "react";
 
 import { productTable, productVariantTable } from "@/db/schema";
 import { formatCentsToBRL } from "@/helpers/money";
+import { cn } from "@/lib/utils";
 
 interface ProductItemProps {
   product: typeof productTable.$inferSelect & {
     variants: (typeof productVariantTable.$inferSelect)[];
   };
+  textContainerClassName?: string;
 }
 
-const ProductItem = ({ product }: ProductItemProps) => {
+const ProductItem = ({ product, textContainerClassName }: ProductItemProps) => {
   const firstVariant = product.variants[0];
 
   return (
-    <Link href={"/"} className="flex flex-col gap-4">
+    <Link
+      href={`/product-variant/${firstVariant.slug}`}
+      className="flex flex-col gap-4"
+    >
+      {/* Forma para dimensionar a imagem de acordo com o tamanho da tela */}
       <Image
         src={firstVariant.imageUrl}
         alt={firstVariant.name}
-        width={150}
-        height={150}
-        className="rounded-3xl"
+        sizes="100vw"
+        width={0}
+        height={0}
+        className="h-auto w-full rounded-3xl"
       />
-      <div className="flex max-w-[150px] flex-col gap-1">
+      <div
+        className={cn(
+          "flex max-w-[150px] flex-col gap-1",
+          textContainerClassName,
+        )}
+      >
         <p className="truncate text-sm font-medium">{product.name}</p>
         <p className="text-muted-foreground truncate text-xs font-medium">
           {product.description}
